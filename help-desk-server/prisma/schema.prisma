@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  TECH
+  CLIENT
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  username String @unique
+  email String @unique
+  password String
+  role Role @default(CLIENT)
+  profilePicture String?
+  createdAt DateTime @default(now())
+  
+  servicesAsClient Service[] @relation("ClientServices")
+  servicesAsTech Service[] @relation("TechServices")
+
+  workHours WorkHours?
+}
+
+model WorkHours {
+  id        Int      @id @default(autoincrement())
+  workTime  String[]
+  tech      User     @relation(fields: [techId], references: [id], onDelete: Cascade)
+  techId    Int      @unique
+}
+
+enum ServiceStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETE
+}
+
+model Service {
+id Int @id @default(autoincrement())
+title String
+description String
+status ServiceStatus @default(PENDING)
+
+
+clientId Int
+techId Int?
+
+categories  ServiceCategory[]
+
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
+
+client User @relation("ClientServices", fields: [clientId], references: [id])
+tech User? @relation("TechServices", fields: [techId], references: [id])
+}
+
+// Categorias responsáveis por dar preço aos serviços.
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String
+  basePrice Int
+  isActive Boolean @default(true)
+  services  ServiceCategory[]
+}
+
+enum ServiceCategoryType {
+  BASE
+  ADDITIONAL
+}
+
+model ServiceCategory {
+  service   Service             @relation(fields: [serviceId], references: [id])
+  serviceId Int
+  category  Category            @relation(fields: [categoryId], references: [id])
+  categoryId Int
+  type      ServiceCategoryType
+
+  @@id([serviceId, categoryId])
+}

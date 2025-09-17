@@ -8,9 +8,15 @@ services:
       - "4000:3000"
     depends_on:
       - db
+    command: >
+      sh -c "npx prisma migrate deploy && npx prisma db seed && npm run start"
     environment:
       NODE_ENV: production
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/helpdesk
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/helpdesk?schema=public
+      AUTH_SECRET: "HelpdeskVictor"
+      CLOUDINARY_CLOUD_NAME: "dmbhqshrk"
+      CLOUDINARY_API_KEY: "115923379927522"
+      CLOUDINARY_API_SECRET: "w9wfrd86lHflS2ItF2Swk2d1484"
 
   frontend:
     build: ./help-desk-web

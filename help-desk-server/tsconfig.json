@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "isolatedModules": true,
+    "lib": [
+      "ES2024"
+    ],
+    "module": "nodenext",
+    "target": "ES2024",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "nodenext",
+    "baseUrl": ".",
+    "paths": {
+      "@src/*": [
+        "src/*"
+      ],
+      "@controllers/*": [
+        "src/controllers/*"
+      ],
+      "@services/*": [
+        "src/services/*"
+      ],
+      "@middlewares/*": [
+        "src/middlewares/*"
+      ],
+      "@repository/*": [
+        "src/repository/*"
+      ]
+    },
+    "outDir": "./dist",
+    "rootDir": "."
+  },
+  "include": [
+    "src",
+    "prisma"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
