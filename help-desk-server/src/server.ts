@@ -12,12 +12,9 @@ import cors from "cors";
 const app = express();
 const port = 3000;
 
-const frontendUrl = process.env.FRONTEND_URL;
-console.log("Frontend URL:", frontendUrl);
-
 app.use(
   cors({
-    origin: frontendUrl,
+    origin: process.env.FRONTEND_URL,
     credentials: true,
   })
 );
