@@ -12,14 +12,14 @@ import cors from "cors";
 const app = express();
 const port = 3000;
 
-app.use(express.json());
-app.use(cookieParser());
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
     credentials: true,
   })
 );
+app.use(express.json());
+app.use(cookieParser());
 
 app.use("/", clientRoutes);
 app.use("/", techRoutes);
@@ -35,5 +35,6 @@ console.log("Acesse /api-docs para ver todas as rotas!");
 app.listen(port, "0.0.0.0", () => {
   console.log(`🚀 Backend rodando na porta ${port}`);
 });
+console.log("Valor de process.env.FRONTEND_URL:", process.env.FRONTEND_URL);
 
 export default app;
