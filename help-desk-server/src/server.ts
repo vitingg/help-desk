@@ -36,4 +36,9 @@ app.listen(port, "0.0.0.0", () => {
   console.log(`🚀 Backend rodando na porta ${port}`);
 });
 
+console.log("=============================================");
+console.log("INICIANDO DEBUG DA VARIÁVEL DE AMBIENTE");
+console.log("DATABASE_URL Recebida:", process.env.DATABASE_URL);
+console.log("=============================================");
+
 export default app;
