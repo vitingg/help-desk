@@ -17,7 +17,7 @@ Desenvolver uma aplicação de ponta a ponta (front-end e back-end), simulando u
 | **Front-End** | `React.js`, `TailwindCSS`                       |
 | **Back-End** | `Node.js` com `Express`                         |
 | **Banco de Dados** | `MySQL` / `PostgreSQL`                          |
-| **ORM** | `Prisma` ou `Sequelize`                         |
+| **ORM** | `Prisma`                         |
 | **Controle de Versão** | `Git` e `GitHub`                                |
 | **Containerização** | `Docker`                                        |
 | **Outros Recursos** | `Axios`, `JWT (autenticação)`, `bcrypt` (hash) |
