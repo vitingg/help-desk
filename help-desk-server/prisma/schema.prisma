@@ -75,7 +75,7 @@ enum ServiceCategoryType {
 }
 
 model ServiceCategory {
-  service   Service             @relation(fields: [serviceId], references: [id])
+  service   Service             @relation(fields: [serviceId], references: [id], onDelete: Cascade)
   serviceId Int
   category  Category            @relation(fields: [categoryId], references: [id])
   categoryId Int
