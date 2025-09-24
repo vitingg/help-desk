@@ -56,8 +56,8 @@ categories  ServiceCategory[]
 createdAt DateTime @default(now())
 updatedAt DateTime @updatedAt
 
-client User @relation("ClientServices", fields: [clientId], references: [id])
-tech User? @relation("TechServices", fields: [techId], references: [id])
+client User @relation("ClientServices", fields: [clientId], references: [id], onDelete: Cascade)
+tech User? @relation("TechServices", fields: [techId], references: [id], onDelete: SetNull)
 }
 
 // Categorias responsáveis por dar preço aos serviços.
