@@ -60,7 +60,6 @@ client User @relation("ClientServices", fields: [clientId], references: [id], on
 tech User? @relation("TechServices", fields: [techId], references: [id], onDelete: SetNull)
 }
 
-// Categorias responsáveis por dar preço aos serviços.
 model Category {
   id        Int       @id @default(autoincrement())
   name      String

@@ -1,54 +1,99 @@
-import type { Prisma } from "@prisma/client";
+import type { ServiceStatus } from "@prisma/client";
 import { prisma } from "@src/lib/prisma";
-import { ICreateCategoriesServiceInterface } from "@src/services/ticket-service";
+import { CreateTicketDto } from "@src/types/ticket";
+
+const ticketInclude = {
+  client: {
+    select: { id: true, username: true, email: true },
+  },
+  tech: {
+    select: { id: true, username: true, email: true },
+  },
+  categories: {
+    include: {
+      category: true,
+    },
+  },
+};
 
 export const ticketRepository = {
-  create: async (data: Prisma.ServiceCreateInput) => {
+  findAll: async () => {
+    return prisma.service.findMany({
+      include: ticketInclude,
+      orderBy: { createdAt: "desc" },
+    });
+  },
+
+  findById: async (id: number) => {
+    return prisma.service.findUnique({
+      where: { id },
+      include: ticketInclude,
+    });
+  },
+
+  create: async (data: CreateTicketDto) => {
     return prisma.service.create({
-      data,
-      include: {
-        client: {
-          select: {
-            id: true,
-            username: true,
-          },
-        },
-        tech: {
-          select: {
-            id: true,
-            username: true,
-          },
-        },
+      data: {
+        title: data.title,
+        description: data.description,
+        clientId: data.clientId,
         categories: {
-          include: {
-            category: true,
-          },
+          create: [
+            { categoryId: data.baseCategoryId, type: "BASE" },
+            ...(data.additionalCategoryIds || []).map((catId) => ({
+              categoryId: catId,
+              type: "ADDITIONAL" as const,
+            })),
+          ],
         },
       },
+      include: ticketInclude,
     });
   },
-};
 
-export const categoryRepository = {
-  findById: async (id: number) => {
-    return prisma.category.findUnique({
+  updateStatus: async (id: number, status: ServiceStatus) => {
+    return prisma.service.update({
       where: { id },
+      data: { status },
+      include: ticketInclude,
     });
   },
-};
 
-export const categoryExists = {
-  findFirst: async (name: string) => {
-    return prisma.category.findFirst({
-      where: { name },
+  assignTech: async (id: number, techId: number) => {
+    return prisma.service.update({
+      where: { id },
+      data: {
+        techId,
+        status: "IN_PROGRESS",
+      },
+      include: ticketInclude,
     });
   },
-};
 
-export const createCategory = {
-  create: async (data: ICreateCategoriesServiceInterface) => {
-    return prisma.category.create({
-      data: data,
+  findCategoriesByServiceId: async (serviceId: number) => {
+    return prisma.serviceCategory.findMany({
+      where: { serviceId },
+    });
+  },
+
+  addCategories: async (id: number, categoryIds: number[]) => {
+    return prisma.service.update({
+      where: { id },
+      data: {
+        categories: {
+          create: categoryIds.map((catId) => ({
+            categoryId: catId,
+            type: "ADDITIONAL",
+          })),
+        },
+      },
+      include: ticketInclude,
+    });
+  },
+
+  delete: async (id: number) => {
+    return prisma.service.delete({
+      where: { id },
     });
   },
 };

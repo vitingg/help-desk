@@ -1,13 +1,13 @@
+import type { UpdateUserType } from "@src/types/users/update-user-profile-type";
+import { techService } from "@src/services/users/tech-service";
 import { Request, Response, NextFunction } from "express";
-import { userServices } from "@src/services/user-service";
-import { prisma } from "@src/lib/prisma";
 import { cloudinary } from "@src/lib/cloudinary";
 
 export const createTech = async (req: Request, res: Response) => {
   try {
     const { username, email, password, workHours } = req.body;
 
-    const newUser = await userServices.createTechUser({
+    const newUser = await techService.create({
       username,
       email,
       password,
@@ -27,22 +27,7 @@ export const getTechs = async (
   next: NextFunction
 ) => {
   try {
-    const techs = await prisma.user.findMany({
-      where: {
-        role: "TECH",
-      },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        role: true,
-        createdAt: true,
-        profilePicture: true,
-        workHours: true,
-        servicesAsTech: true,
-        servicesAsClient: true,
-      },
-    });
+    const techs = await techService.getAllTechs();
     res.status(200).json({ techs: techs });
   } catch (error) {
     console.log("Error in search techs.");
@@ -59,36 +44,8 @@ export const getOneTech = async (
   const techId = Number(id);
 
   try {
-    const existingUser = await prisma.user.findUnique({
-      where: {
-        id: techId,
-        role: "TECH",
-      },
-    });
-
-    if (!existingUser) {
-      res
-        .status(400)
-        .json({ message: "Doesn`t exists any tech with this id." });
-    }
-
-    const techs = await prisma.user.findUnique({
-      where: {
-        id: techId,
-      },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        role: true,
-        createdAt: true,
-        profilePicture: true,
-        workHours: true,
-        servicesAsTech: true,
-        servicesAsClient: true,
-      },
-    });
-    res.status(200).json({ techs: techs });
+    const tech = await techService.getOneTech({ id: techId });
+    res.status(200).json({ techs: tech });
   } catch (error) {
     console.log("Error in get one tech.");
     res.status(500).json({ error: error });
@@ -106,35 +63,25 @@ export const putTech = async (
   const userId = Number(id);
 
   if (!username || !email) {
-    res
+    return res
       .status(400)
       .json({ message: "Inform your username or email correctly!" });
   }
 
-  const workHoursArray =
-    typeof workHours === "string" ? JSON.parse(workHours) : workHours;
+  let workHoursArray = [];
+  try {
+    workHoursArray =
+      typeof workHours === "string" ? JSON.parse(workHours) : workHours;
+  } catch (error) {
+    return res.status(400).json({ message: "Invalid workHours format" });
+  }
 
   try {
-    const existingUser = await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-    });
+    const existingUser = await techService.verifyUniqueTechById({ id: userId });
     if (!existingUser) {
-      res
+      return res
         .status(400)
         .json({ message: "Doesn't exists any techs with this credentials." });
-    }
-    const emailAlreadyTaken = await prisma.user.findFirst({
-      where: {
-        email: email,
-        id: { not: userId },
-      },
-    });
-    if (emailAlreadyTaken) {
-      res
-        .status(409)
-        .json({ message: "Already exists a person with this email." });
     }
 
     let imageUrl = existingUser.profilePicture;
@@ -150,26 +97,16 @@ export const putTech = async (
       imageUrl = result.secure_url;
     }
 
-    const user = await prisma.user.update({
-      where: {
-        id: userId,
-        role: "TECH",
-      },
-      data: {
-        username: username,
-        email: email,
-        workHours: {
-          update: {
-            workTime: workHoursArray,
-          },
-        },
-        profilePicture: imageUrl,
-      },
-    });
+    const updatedData: UpdateUserType = {
+      username,
+      email,
+      workHoursArray,
+      imageUrl,
+      role: "TECH",
+    };
+    const updateTech = await techService.updateTech(userId, updatedData);
 
-    const { password, ...safeUser } = user;
-
-    res.status(200).json(safeUser);
+    res.status(200).json(updateTech);
   } catch (error) {
     console.log("Error in update tech.", error);
     res.status(400).json({ error: error });
@@ -183,12 +120,7 @@ export const deleteTech = async (
 ) => {
   const { id } = req.params;
   try {
-    const user = await prisma.user.delete({
-      where: {
-        id: Number(id),
-      },
-    });
-
+    const user = techService.deleteTech({ id });
     res.status(200).json({ user });
   } catch (error) {
     console.log("Error in delete tech.", error);

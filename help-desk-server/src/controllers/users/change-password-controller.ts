@@ -1,20 +1,26 @@
+import type { changePasswordType } from "@src/types/users/change-password-type";
+import { changePasswordService } from "@src/services/users/change-password-service";
 import { Request, Response } from "express";
-import { userServices } from "@src/services/user-service";
 
-export async function changePasswordController(req: Request, res: Response) {
+type ChangePasswordBody = Omit<changePasswordType, "userIdFromToken">;
+
+export async function changePasswordController(
+  req: Request<{}, {}, ChangePasswordBody>,
+  res: Response
+) {
   const { oldPassword, newPassword } = req.body;
   const userIdFromToken = req.user?.userId;
 
   if (!oldPassword || !newPassword) {
-    res.status(400).json({ message: "Invalid Credentials" });
+    return res.status(400).json({ message: "Invalid Credentials" });
   }
 
   if (!userIdFromToken) {
-    res.status(400).json({ message: "No users informed!" });
+    return res.status(400).json({ message: "No users informed!" });
   }
 
   try {
-    const user = await userServices.changePassword({
+    const user = await changePasswordService.changePassword({
       oldPassword,
       newPassword,
       userIdFromToken,

@@ -2,11 +2,11 @@ import { app } from "@src/lib/app-express";
 import {
   createTicket,
   getTickets,
-  deleteTickets,
+  deleteTicket,
   patchTicketStatus,
-  getTicketsById,
-  patchTicketAdditionalCategory,
-  patchTicketAddTech,
+  getTicketById,
+  patchAddCategories,
+  patchAssignTech,
 } from "@controllers/tickets/ticket-controller";
 import { authorize } from "@src/middlewares/authorize";
 
@@ -73,7 +73,7 @@ app.get("/services", getTickets);
  *       401:
  *         description: Não autorizado
  */
-app.get("/services/:id", getTicketsById);
+app.get("/services/:id", getTicketById);
 
 /**
  * @openapi
@@ -143,7 +143,7 @@ app.patch("/services/:id/change-status", patchTicketStatus);
  *       401:
  *         description: Não autorizado
  */
-app.patch("/services/:id/additional-categories", patchTicketAdditionalCategory);
+app.patch("/services/:id/additional-categories", patchAddCategories);
 
 /**
  * @openapi
@@ -179,7 +179,7 @@ app.patch("/services/:id/additional-categories", patchTicketAdditionalCategory);
  *       401:
  *         description: Não autorizado
  */
-app.patch("/services/:id/assign", authorize([`TECH`]), patchTicketAddTech);
+app.patch("/services/:id/assign", authorize([`TECH`]), patchAssignTech);
 
 /**
  * @openapi
@@ -205,6 +205,6 @@ app.patch("/services/:id/assign", authorize([`TECH`]), patchTicketAddTech);
  *       500:
  *         description: Erro interno do servidor.
  */
-app.delete("/services/:id", deleteTickets);
+app.delete("/services/:id", deleteTicket);
 
 export default app;

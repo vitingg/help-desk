@@ -1,13 +1,13 @@
 import { app } from "@src/lib/app-express";
 import {
-  createCategories,
-  getCategories,
+  createCategory,
   clientGetCategories,
-  patchToggleActivities,
-  putChangeNameOrPrice,
-  deleteCategories,
+  deleteCategory,
+  getCategories,
   getOneCategory,
-} from "@src/controllers/tickets/category-controller";
+  toggleCategoryStatus,
+  updateCategory,
+} from "@src/controllers/category/category-controller";
 
 /**
  * @openapi
@@ -38,7 +38,7 @@ import {
  *       401:
  *         description: Não autorizado
  */
-app.post("/categories", createCategories);
+app.post("/categories", createCategory);
 
 /**
  * @openapi
@@ -126,7 +126,7 @@ app.get("/categories/:id", getOneCategory);
  *       401:
  *         description: Não autorizado
  */
-app.put("/categories/toggle/:id", patchToggleActivities);
+app.put("/categories/toggle/:id", toggleCategoryStatus);
 
 /**
  * @openapi
@@ -160,7 +160,7 @@ app.put("/categories/toggle/:id", patchToggleActivities);
  *       401:
  *         description: Não autorizado
  */
-app.put("/categories/:id", putChangeNameOrPrice);
+app.put("/categories/:id", updateCategory);
 
 /**
  * @openapi
@@ -183,6 +183,6 @@ app.put("/categories/:id", putChangeNameOrPrice);
  *       401:
  *         description: Não autorizado
  */
-app.delete("/categories/:id", deleteCategories);
+app.delete("/categories/:id", deleteCategory);
 
 export default app;

@@ -1,12 +1,11 @@
+import { authService } from "@src/services/users/auth-service";
 import { Request, Response } from "express";
-import { userServices } from "@src/services/user-service";
-import { userRepository } from "@src/repository/user-repository";
 
 export const signInController = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   try {
-    const result = await userServices.signInUser({ email, password });
+    const result = await authService.signInUser({ email, password });
     const { token, newUser } = result;
 
     res.cookie("token", token, {
@@ -35,8 +34,8 @@ export const signOutController = async (req: Request, res: Response) => {
 
 export const getCurrentUser = async (req: Request, res: Response) => {
   try {
-    const userId = req.user!.userId;
-    const user = await userRepository.findById(userId);
+    const id = req.user!.userId;
+    const user = await authService.searchId(id);
 
     if (!user) {
       res.status(404).json({ message: "User not found" });

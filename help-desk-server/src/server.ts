@@ -1,5 +1,5 @@
 import changePassword from "./routes/users/change-password-routes";
-import category from "./routes/tickets/category-routes";
+import category from "./routes/category/category-routes";
 import clientRoutes from "./routes/users/client-routes";
 import { setupSwagger } from "./utils/swagger-config";
 import service from "./routes/tickets/ticket-routes";
